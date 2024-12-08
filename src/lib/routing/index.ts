@@ -47,6 +47,10 @@ export function createRouter({
     history.pushState({}, "", targetPathname);
     matchRoute(targetPathname);
   });
+
+  window.addEventListener("popstate", () => {
+    matchRoute(window.location.pathname);
+  });
 }
 
 function findAnchorTag(element: HTMLElement): HTMLAnchorElement | null {
