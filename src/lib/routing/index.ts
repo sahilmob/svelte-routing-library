@@ -28,19 +28,31 @@ export function createRouter({
     currentComponent = new MatchedComponent({
       target: target,
     });
-
-    document.querySelectorAll("a").forEach((a) => {
-      a.addEventListener("click", (e) => {
-        if (a.target) return;
-
-        e.preventDefault();
-        const targetLocation = a.href;
-        const targetPathname = new URL(targetLocation).pathname;
-        history.pushState({}, "", targetPathname);
-        matchRoute(targetPathname);
-      });
-    });
   }
 
   matchRoute(pathname);
+
+  window.addEventListener("click", (e) => {
+    const clickTarget = e.target;
+    const anchorTag = findAnchorTag(clickTarget as HTMLElement);
+
+    if (!anchorTag) return;
+
+    if (anchorTag.target) return;
+    if (anchorTag.hasAttribute("no-routing")) return;
+
+    e.preventDefault();
+    const targetLocation = anchorTag.href;
+    const targetPathname = new URL(targetLocation).pathname;
+    history.pushState({}, "", targetPathname);
+    matchRoute(targetPathname);
+  });
+}
+
+function findAnchorTag(element: HTMLElement): HTMLAnchorElement | null {
+  if (element.tagName === "HTML") return null;
+
+  if (element.tagName === "A") return element as HTMLAnchorElement;
+  else
+    return element.parentElement ? findAnchorTag(element.parentElement) : null;
 }
