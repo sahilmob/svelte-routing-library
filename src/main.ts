@@ -1,21 +1,18 @@
-import A from "./routes/A.svelte";
-import B from "./routes/B.svelte";
-import C from "./routes/C.svelte";
 import { createRouter } from "./lib/routing";
 
 createRouter({
   routes: [
     {
       url: "/",
-      component: A,
+      component: () => import("./routes/A.svelte"),
     },
     {
       url: "/b",
-      component: B,
+      component: () => import("./routes/B.svelte"),
     },
     {
       url: "/c",
-      component: C,
+      component: () => import("./routes/C.svelte"),
     },
   ],
   target: document.getElementById("app")!,
