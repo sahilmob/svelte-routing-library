@@ -18,6 +18,7 @@ export function createRouter({
   target: HTMLElement;
 }) {
   let currentComponent: SvelteComponent;
+  let currentComponentInstance: SvelteComponent;
   const pathname = window.location.pathname;
 
   const indicator = new LoadingIndicator({
@@ -55,10 +56,17 @@ export function createRouter({
     showLoadingIndictor();
     matchedComponentPromise().then((C) => {
       hideLoadingIndicator();
-      if (currentComponent) {
-        currentComponent.$destroy();
+
+      if (C.default === currentComponent) {
+        currentComponentInstance.$set(matchedRouteParams);
+        return;
       }
-      currentComponent = new C.default({
+
+      if (currentComponentInstance) {
+        currentComponentInstance.$destroy();
+      }
+      currentComponent = C.default;
+      currentComponentInstance = new C.default({
         target: target,
         props: matchedRouteParams,
       });
