@@ -14,11 +14,33 @@ export function createRouter({
   routes: Route[];
   target: HTMLElement;
 }) {
+  let currentComponent: SvelteComponent;
   const pathname = window.location.pathname;
-  const matchedRoute = routes.find((r) => r.url === pathname);
-  const MatchedComponent = matchedRoute?.component ?? NotFound;
 
-  new MatchedComponent({
-    target: target,
-  });
+  function matchRoute(pathName: string) {
+    if (currentComponent) {
+      currentComponent.$destroy();
+    }
+
+    const matchedRoute = routes.find((r) => r.url === pathName);
+    const MatchedComponent = matchedRoute?.component ?? NotFound;
+
+    currentComponent = new MatchedComponent({
+      target: target,
+    });
+
+    document.querySelectorAll("a").forEach((a) => {
+      a.addEventListener("click", (e) => {
+        if (a.target) return;
+
+        e.preventDefault();
+        const targetLocation = a.href;
+        const targetPathname = new URL(targetLocation).pathname;
+        history.pushState({}, "", targetPathname);
+        matchRoute(targetPathname);
+      });
+    });
+  }
+
+  matchRoute(pathname);
 }
