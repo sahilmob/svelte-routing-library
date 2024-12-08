@@ -1,8 +1,22 @@
-import './app.css'
-import App from './App.svelte'
+import A from "./routes/A.svelte";
+import B from "./routes/B.svelte";
+import C from "./routes/C.svelte";
+import { createRouter } from "./lib/routing";
 
-const app = new App({
-  target: document.getElementById('app')!,
-})
-
-export default app
+createRouter({
+  routes: [
+    {
+      url: "/",
+      component: A,
+    },
+    {
+      url: "/b",
+      component: B,
+    },
+    {
+      url: "/c",
+      component: C,
+    },
+  ],
+  target: document.getElementById("app")!,
+});
