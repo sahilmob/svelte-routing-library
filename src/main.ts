@@ -3,25 +3,26 @@ import { createRouter } from "./lib/routing";
 createRouter({
   routes: [
     {
-      url: /^\/$/,
+      url: /^\/\/?$/,
       component: () => import("./routes/A.svelte"),
     },
     {
-      url: /^\/b$/,
+      url: /^\/b\/?$/,
       component: () => import("./routes/B.svelte"),
     },
     {
-      url: /^\/c$/,
+      url: /^\/c\/?$/,
       component: () => import("./routes/C.svelte"),
     },
     {
-      url: /^\/shop\/(.+)$/,
+      url: /^\/shop\/([^/]+)\/?$/,
       params: ["shopId"],
       component: () => import("./routes/Shop.svelte"),
     },
     {
-      url: /^\/item\/(.+)\/(.+)$/,
+      url: /^\/shop\/([^/]+)\/([^/]+)\/?$/,
       params: ["shopId", "itemId"],
+      paramsMatching: [(shopId) => /^\d+$/.test(shopId)],
       component: () => import("./routes/Item.svelte"),
     },
   ],
