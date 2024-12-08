@@ -15,8 +15,14 @@ createRouter({
       component: () => import("./routes/C.svelte"),
     },
     {
-      url: /^\/shop\/.+$/,
+      url: /^\/shop\/(.+)$/,
+      params: ["shopId"],
       component: () => import("./routes/Shop.svelte"),
+    },
+    {
+      url: /^\/item\/(.+)\/(.+)$/,
+      params: ["shopId", "itemId"],
+      component: () => import("./routes/Item.svelte"),
     },
   ],
   target: document.getElementById("app")!,
