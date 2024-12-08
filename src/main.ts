@@ -3,16 +3,20 @@ import { createRouter } from "./lib/routing";
 createRouter({
   routes: [
     {
-      url: "/",
+      url: /^\/$/,
       component: () => import("./routes/A.svelte"),
     },
     {
-      url: "/b",
+      url: /^\/b$/,
       component: () => import("./routes/B.svelte"),
     },
     {
-      url: "/c",
+      url: /^\/c$/,
       component: () => import("./routes/C.svelte"),
+    },
+    {
+      url: /^\/shop\/.+$/,
+      component: () => import("./routes/Shop.svelte"),
     },
   ],
   target: document.getElementById("app")!,

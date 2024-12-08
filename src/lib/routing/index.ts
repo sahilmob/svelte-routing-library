@@ -5,7 +5,7 @@ import LoadingIndicator from "./LoadingIndicator.svelte";
 const NotFound = () => import("../../routes/NotFound.svelte");
 
 interface Route {
-  url: string;
+  url: RegExp;
   component: () => Promise<SvelteComponent>;
 }
 
@@ -32,7 +32,7 @@ export function createRouter({
   }
 
   function matchRoute(pathName: string) {
-    const matchedRoute = routes.find((r) => r.url === pathName);
+    const matchedRoute = routes.find((r) => r.url.test(pathName));
     const matchedComponentPromise = matchedRoute?.component ?? NotFound;
     showLoadingIndictor();
     matchedComponentPromise().then((C) => {
