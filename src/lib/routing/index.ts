@@ -6,8 +6,12 @@ const NotFound = () => import("../../routes/NotFound.svelte");
 
 interface Route {
   url: RegExp;
-  params?: string[];
-  paramsMatching?: Array<(param: string) => boolean>;
+  params?: Array<{
+    name: string;
+    matching?: (param: string) => boolean;
+    rest?: boolean;
+  }>;
+
   component: () => Promise<SvelteComponent>;
 }
 
@@ -35,26 +39,26 @@ export function createRouter({
   }
 
   function matchRoute(pathName: string) {
-    let matchedRouteParams: { [k: string]: string };
+    let matchedRouteParams: { [k: string]: string | string[] };
     let matchedRoute: Route;
 
     routeMatching: for (const r of routes) {
       const match = pathName.match(r.url);
       if (match) {
-        const params: { [k: string]: string } = {};
+        const params: { [k: string]: string | string[] } = {};
         if (r.params) {
           for (let i = 0; i < r.params.length; i++) {
-            const paramName = r.params[i];
-            const paramValue = match[i + 1];
-            const paramMatching = r.paramsMatching?.[i];
-            if (typeof paramMatching === "function") {
-              if (!paramMatching(paramValue)) {
+            const { name, matching, rest } = r.params?.[i];
+            const paramValue: string | string[] = match[i + 1] ?? "";
+            if (typeof matching === "function") {
+              if (!matching(paramValue)) {
                 continue routeMatching;
               }
             }
-            params[paramName] = paramValue;
+            params[name] = rest ? paramValue.split("/") : paramValue;
           }
         }
+
         matchedRouteParams = params;
         matchedRoute = r;
         break;

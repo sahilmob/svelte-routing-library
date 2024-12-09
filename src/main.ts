@@ -16,14 +16,21 @@ createRouter({
     },
     {
       url: /^\/shop\/([^/]+)\/?$/,
-      params: ["shopId"],
+      params: [{ name: "shopId", matching: (shopId) => /^\d+$/.test(shopId) }],
       component: () => import("./routes/Shop.svelte"),
     },
     {
       url: /^\/shop\/([^/]+)\/([^/]+)\/?$/,
-      params: ["shopId", "itemId"],
-      paramsMatching: [(shopId) => /^\d+$/.test(shopId)],
+      params: [
+        { name: "shopId", matching: (shopId) => /^\d+$/.test(shopId) },
+        { name: "itemId", matching: (itemId) => /^\d+$/.test(itemId) },
+      ],
       component: () => import("./routes/Item.svelte"),
+    },
+    {
+      url: /^\/a(?:\/?|\/(.+)\/?)$/,
+      params: [{ name: "rest", rest: true }],
+      component: () => import("./routes/Rest.svelte"),
     },
   ],
   target: document.getElementById("app")!,
