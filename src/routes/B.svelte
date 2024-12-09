@@ -1,2 +1,2 @@
 <h1>B</h1>
-<a href="/">Got to A</a>
+<a href="/">Go to A</a>

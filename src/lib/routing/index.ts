@@ -1,8 +1,9 @@
 import type { SvelteComponent } from "svelte";
 
+import Main from "./Main.svelte";
 import LoadingIndicator from "./LoadingIndicator.svelte";
 
-const NotFound = () => import("../../routes/NotFound.svelte");
+const NotFound = [() => import("../../routes/NotFound.svelte")];
 
 interface Route {
   url: RegExp;
@@ -12,7 +13,7 @@ interface Route {
     rest?: boolean;
   }>;
 
-  component: () => Promise<SvelteComponent>;
+  components: Array<() => Promise<SvelteComponent>>;
 }
 
 export function createRouter({
@@ -22,9 +23,9 @@ export function createRouter({
   routes: Route[];
   target: HTMLElement;
 }) {
-  let currentComponent: SvelteComponent;
-  let currentComponentInstance: SvelteComponent;
   const pathname = window.location.pathname;
+
+  let main: SvelteComponent;
 
   const indicator = new LoadingIndicator({
     target: document.body,
@@ -65,25 +66,29 @@ export function createRouter({
       }
     }
 
-    const matchedComponentPromise = matchedRoute?.component ?? NotFound;
+    const matchedComponentsPromises = matchedRoute?.components ?? NotFound;
     showLoadingIndictor();
-    matchedComponentPromise().then((C) => {
-      hideLoadingIndicator();
 
-      if (C.default === currentComponent) {
-        currentComponentInstance.$set(matchedRouteParams);
-        return;
-      }
+    Promise.all(matchedComponentsPromises.map((fn) => fn())).then(
+      (matchedComponentsModules) => {
+        hideLoadingIndicator();
+        const matchedComponents = matchedComponentsModules.map(
+          (m) => m.default
+        );
 
-      if (currentComponentInstance) {
-        currentComponentInstance.$destroy();
+        if (!main) {
+          main = new Main({
+            target,
+            props: { matchedRouteParams, matchedComponents },
+          });
+        } else {
+          main.$set({
+            matchedComponents,
+            matchedRouteParams,
+          });
+        }
       }
-      currentComponent = C.default;
-      currentComponentInstance = new C.default({
-        target: target,
-        props: matchedRouteParams,
-      });
-    });
+    );
   }
 
   matchRoute(pathname);
